@@ -1,3 +1,28 @@
-div {
-  color: blue;
+#root {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.main_wrapper {
+  width: 50%;
+}
+.main_wrapper .time_header {
+  display: flex;
+  justify-content: space-between;
+  align-content: space-around;
+  margin-bottom: 50px;
+}
+
+.main_wrapper .question {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.main_wrapper .text_wrapper {
+  margin-top: 25px;
+}
+
+.main_wrapper .btn_wrapper {
+  margin-top: 25px;
 }

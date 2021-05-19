@@ -2,8 +2,8 @@ import Home from './pages/home';
 import Result from './pages/result';
 
 interface RouteType {
-  home: { render: () => Promise<string> };
-  result: { render: () => Promise<string> };
+  home: { render: ({ time, score, isGameStarted }: { time: number; score: number; isGameStarted: boolean }) => Promise<string> };
+  result: { render: ({ time, score }: { time: number; score: number }) => Promise<string> };
 }
 
 const routes: RouteType = {
@@ -22,7 +22,7 @@ export const render = async () => {
     }
 
     // history.pushState(null, document.title, location.origin + '/' + hash);
-    root.innerHTML = await url.render();
+    root.innerHTML = await url.render({ time: 10, score: 100, isGameStarted: false });
   } catch (e) {
     const root = document.getElementById('root');
     root.innerHTML = `<div>페이지를 찾을 수 없습니다.</div>`;

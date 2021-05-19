@@ -1,18 +1,18 @@
 const Home = {
-  render: async () => {
+  render: async ({ time, score, isGameStarted }: { time: number; score: number; isGameStarted: boolean }) => {
     const view = `
-    <div className="main_wrapper">
+    <div class="main_wrapper">
       <h1>단어 타이핑 게임</h1>
-      <div>시작버튼을 눌러주세요!</div>
-      <div>
-        <div>시간 : <span id="countdown">10</span></div>
-        <div>점수 : <span id="points">100점</span></div>
+      <div class="time_header">
+        <div>시간 : <span id="countdown">${time}</span></div>
+        <div>점수 : <span id="points">${score}점</span></div>
       </div>
-      <div>
+      <div class="question">시작버튼을 눌러주세요!</div>
+      <div class="text_wrapper">
         <input type="text" id="answer" placeholder="단어 입력"/>
       </div>
-      <div>
-        <button id="start_btn">start</button>
+      <div class="btn_wrapper">
+        <button id="start_btn">${isGameStarted ? '다시하기' : '게임시작'}</button>
       </div>
     </div>`;
     return view;
