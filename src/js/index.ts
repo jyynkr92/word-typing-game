@@ -65,6 +65,7 @@ export class Game {
 
 (() => {
   const game = new Game();
-  window.addEventListener('hashchange', () => render({ game }));
-  window.addEventListener('load', () => render({ game }));
+  const hash = window.location.hash.replace('#', '');
+  window.addEventListener('hashchange', () => render({ game, hash }));
+  window.addEventListener('load', () => render({ game, hash }));
 })();

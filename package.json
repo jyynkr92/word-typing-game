@@ -4,7 +4,12 @@
   "description": "",
   "private": true,
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.23",
+    "babel": "^6.23.0",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "ts-jest": "^26.5.6",
     "webpack": "^5.37.0",
     "webpack-cli": "^4.7.0"
   },
@@ -24,10 +29,19 @@
     "webpack-dev-server": "^3.11.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack -w",
     "start": "webpack serve",
     "serve": "webpack serve"
+  },
+  "jest": {
+    "verbose": true,
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    },
+    "globals": {
+      "window": {}
+    }
   },
   "author": "",
   "license": "ISC"

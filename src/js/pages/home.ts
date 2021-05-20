@@ -1,16 +1,15 @@
-const Home = {
-  render: async ({
-    time,
-    score,
-    isGameStarted,
-    modal,
-  }: {
-    time: number;
-    score: number;
-    isGameStarted: boolean;
-    modal: boolean;
-  }) => {
-    const view = `
+const setHomeHTML = ({
+  time,
+  score,
+  isGameStarted,
+  modal,
+}: {
+  time: number;
+  score: number;
+  isGameStarted: boolean;
+  modal: boolean;
+}) => {
+  const view = `
     <div class="main_wrapper">
       <h1>단어 타이핑 게임</h1>
       <div class="time_header">
@@ -22,7 +21,7 @@ const Home = {
         <input type="text" id="answer" placeholder="단어 입력"/>
       </div>
       <div class="btn_wrapper">
-        <button id="start_btn">${isGameStarted ? '다시하기' : '게임시작'}</button>
+        <button id="start_btn">${isGameStarted ? '초기화' : '게임시작'}</button>
       </div>
       ${
         modal
@@ -35,8 +34,7 @@ const Home = {
           : ''
       }
     </div>`;
-    return view;
-  },
+  return view;
 };
 
-export default Home;
+export default setHomeHTML;
