@@ -1,26 +1,20 @@
 import { Game } from '..';
 import setHomeHTML from '../pages/home';
 
-export const mainInit = ({ game }: { game: Game }) => {
-  const startBtn = document.getElementById('start_btn');
-  startBtn.addEventListener('click', () => {
-    game.isGameStarted ? resetGame({ game }) : startGame({ game });
-  });
-  const answerElem = document.getElementById('answer');
-  answerElem.addEventListener('keydown', (e) => {
-    const keycode = e.key;
-
-    if (keycode === 'Enter') {
-      checkCorrect({ game });
-    }
-  });
-};
-
 export const getQuestions = () => {
   const url = 'https://my-json-server.typicode.com/kakaopay-fe/resources/words';
   return fetch(url).then((response) => {
     return response.json();
   });
+};
+
+export const onStartGame = ({ game, questions }: { game: Game; questions: Array<{ second: number; text: string }> }) => {
+  game.setQuestions(questions);
+  const question = document.querySelector('#question');
+  question.innerHTML = questions[game.count].text.toString();
+  setCountdown({ game });
+  game.setIsGameStarted(true);
+  renderHTML({ game });
 };
 
 export const startGame = async ({ game }: { game: Game }) => {
@@ -33,21 +27,6 @@ export const startGame = async ({ game }: { game: Game }) => {
     renderHTML({ game });
     return;
   }
-};
-
-export const onStartGame = ({
-  game,
-  questions,
-}: {
-  game: Game;
-  questions: Array<{ second: number; text: string }>;
-}) => {
-  game.setQuestions(questions);
-  const question = document.querySelector('#question');
-  question.innerHTML = game.questions[game.count].text.toString();
-  setCountdown({ game });
-  game.setIsGameStarted(true);
-  renderHTML({ game });
 };
 
 export const resetGame = ({ game }: { game: Game }) => {
@@ -101,25 +80,52 @@ export const setCountdown = ({ game }: { game: Game }) => {
   }, 1000);
 };
 
+export const isCorrect = ({ value, answer }: { value: string; answer: string }) => {
+  return value === answer;
+};
+
+export const setNextGame = ({ game }: { game: Game }) => {
+  const userAnswerELem = document.querySelector('#answer') as HTMLInputElement;
+  const countdown = document.querySelector('#countdown');
+  game.setResponseTime(game.questions[game.count].second - parseInt(countdown.textContent));
+  game.setNextGame();
+
+  if (!game.isGameStarted) {
+    window.location.hash = '#result';
+    return;
+  }
+
+  const question = document.querySelector('#question');
+  question.innerHTML = game.questions[game.count].text.toString();
+  userAnswerELem.value = '';
+
+  setCountdown({ game });
+};
+
 export const checkCorrect = ({ game }: { game: Game }) => {
-  const answer = document.querySelector('#answer') as HTMLInputElement;
+  const userAnswerELem = document.querySelector('#answer') as HTMLInputElement;
+  const value = userAnswerELem.value;
+  const answer = game.questions[game.count].text;
 
-  if (answer.value === game.questions[game.count].text) {
-    const countdown = document.querySelector('#countdown');
-    game.setResponseTime(game.questions[game.count].second - parseInt(countdown.textContent));
-    game.setNextGame();
-
-    if (!game.isGameStarted) {
-      window.location.hash = '#result';
-      return;
-    }
-
-    const question = document.querySelector('#question');
-    question.innerHTML = game.questions[game.count].text.toString();
-    answer.value = '';
-
+  if (isCorrect({ value, answer })) {
+    setNextGame({ game });
     setCountdown({ game });
   } else {
-    answer.value = '';
+    userAnswerELem.value = '';
   }
+};
+
+export const mainInit = ({ game }: { game: Game }) => {
+  const startBtn = document.getElementById('start_btn');
+  startBtn.addEventListener('click', () => {
+    game.isGameStarted ? resetGame({ game }) : startGame({ game });
+  });
+  const answerElem = document.getElementById('answer');
+  answerElem.addEventListener('keydown', (e) => {
+    const keycode = e.key;
+
+    if (keycode === 'Enter') {
+      checkCorrect({ game });
+    }
+  });
 };
