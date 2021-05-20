@@ -13,7 +13,7 @@ module.exports = {
     new MiniCssExtractPlugin(),
   ],
   devServer: {
-    contentBase: './dist',
+    contentBase: './public',
     historyApiFallback: true,
     hot: true,
   },
@@ -38,7 +38,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js',
     publicPath: '/',
   },
