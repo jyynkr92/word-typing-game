@@ -14,6 +14,9 @@ export const render = async ({ game, hash }: { game: Game; hash: string }) => {
       if (item) {
         game.setAvgTime(item.avgTime);
         game.setScore(item.score);
+      } else {
+        window.location.hash = '#';
+        return;
       }
     } else {
       game.setResetGame();
