@@ -72,8 +72,8 @@ describe('reset game', () => {
     onResetClick({ game });
   });
 
-  test('start btn should be 게임시작', async () => {
-    expect(document.querySelector('#start_btn').textContent).toEqual('게임시작');
+  test('start btn should be 시작', async () => {
+    expect(document.querySelector('#start_btn').textContent).toEqual('시작');
   });
 
   test('countdown state should be 0', () => {
@@ -85,7 +85,7 @@ describe('reset game', () => {
   });
 
   test('question state should be', () => {
-    expect(document.querySelector('#question').textContent).toEqual('게임시작 버튼을 눌러주세요!');
+    expect(document.querySelector('#question').textContent).toEqual('문제 단어');
   });
 });
 
