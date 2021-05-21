@@ -1,105 +1,113 @@
 import { Game } from '..';
-import setHomeHTML from '../pages/home';
+import { TEXT_RESET, TEXT_START, TEXT_START_QUESTION } from '../../data/content';
+import { getQuestions } from '../api/questionApi';
+import { setHTMLContent } from './common';
 
-export const getQuestions = () => {
-  const url = 'https://my-json-server.typicode.com/kakaopay-fe/resources/words';
-  return fetch(url).then((response) => {
-    return response.json();
+//html 렌더
+export const renderHTML = ({ game }: { game: Game }) => {
+  const { questions, score, count } = game;
+  setHTMLContent({
+    selector: '#countdown',
+    content: questions.length > 0 ? questions[count].second.toString() : '0',
   });
+  setHTMLContent({ selector: '#score', content: score.toString() });
 };
 
-export const onStartGame = ({ game, questions }: { game: Game; questions: Array<{ second: number; text: string }> }) => {
-  game.setQuestions(questions);
-  const question = document.querySelector('#question');
-  question.innerHTML = questions[game.count].text.toString();
-  setCountdown({ game });
-  game.setIsGameStarted(true);
-  renderHTML({ game });
+export const isGameEnd = ({ game }: { game: Game }) => {
+  const { isGameStarted, avgTime, score } = game;
+
+  if (!isGameStarted) {
+    const item = { avgTime, score };
+    window.localStorage.setItem('gameResult', JSON.stringify(item));
+    window.location.hash = '#result';
+    return true;
+  }
+
+  return false;
 };
 
-export const startGame = async ({ game }: { game: Game }) => {
-  try {
-    const questions = await getQuestions();
-    onStartGame({ game, questions });
-  } catch (e) {
-    console.log(e);
-    game.setModal(false);
-    renderHTML({ game });
+export const moveToNextGame = ({ game }: { game: Game }) => {
+  game.setNextGame();
+
+  if (isGameEnd({ game })) {
     return;
   }
-};
 
-export const resetGame = ({ game }: { game: Game }) => {
-  game.setResetGame();
-  const questionElem = document.getElementById('question');
-  questionElem.textContent = '시작버튼을 눌러주세요!';
-  renderHTML({ game });
-};
-
-export const renderHTML = ({ game }: { game: Game }) => {
-  const root = document.querySelector('#root');
-  root.innerHTML = setHomeHTML({
-    time: game.questions[game.count].second,
-    score: game.score,
-    isGameStarted: game.isGameStarted,
-    modal: game.modal,
+  const nextQuestion = game.questions[game.count];
+  setHTMLContent({
+    selector: '#question',
+    content: nextQuestion.text.toString(),
   });
+
+  const userAnswerELem = document.querySelector('#answer') as HTMLInputElement;
+  userAnswerELem.value = '';
+  setCountdown({ game });
 };
 
+//카운트 다운(게임 시작 후, 남은 시간 1초마다 떨어지도록 보여주기)
 export const setCountdown = ({ game }: { game: Game }) => {
-  let time = game.questions[game.count].second;
-  let text = game.questions[game.count].text;
-  const countDown = document.getElementById('countdown');
-  countDown.innerHTML = time.toString();
+  const { questions, count } = game;
+  const question = questions[count];
+  let time = question.second;
+  const text = question.text;
+  setHTMLContent({ selector: '#countdown', content: time.toString() });
+  const questionElem = document.querySelector('#question');
 
   const timer = setInterval(function () {
-    const question = document.querySelector('#question');
-    if (question && text !== question.textContent) {
+    const questionText = questionElem.textContent;
+    if (questionElem && text !== questionText) {
       clearInterval(timer);
       return;
     }
 
     time--;
-    countDown.innerHTML = time.toString();
+    setHTMLContent({ selector: '#countdown', content: time.toString() });
+
     if (time === 0) {
       clearInterval(timer);
-      game.setNextGame();
+      game.setFailCount(game.failCount + 1);
       game.setScore(game.score - 1);
 
-      if (!game.isGameStarted) {
-        window.location.hash = '#result';
-        return;
-      }
+      setHTMLContent({
+        selector: '#score',
+        content: game.score.toString(),
+      });
 
-      const score = document.querySelector('#points');
-      score.innerHTML = game.score.toString();
-      const question = document.querySelector('#question');
-      question.innerHTML = game.questions[game.count].text.toString();
-      setCountdown({ game });
+      moveToNextGame({ game });
     }
   }, 1000);
 };
 
-export const isCorrect = ({ value, answer }: { value: string; answer: string }) => {
-  return value === answer;
+export const setStartGame = ({
+  game,
+  questions,
+}: {
+  game: Game;
+  questions: Array<{ second: number; text: string }>;
+}) => {
+  game.setQuestions(questions);
+  game.setIsGameStarted(true);
+  renderHTML({ game });
+  setCountdown({ game });
+  setHTMLContent({ selector: '#question', content: questions[game.count].text.toString() });
+  setHTMLContent({ selector: '#start_btn', content: TEXT_RESET });
 };
 
-export const setNextGame = ({ game }: { game: Game }) => {
-  const userAnswerELem = document.querySelector('#answer') as HTMLInputElement;
-  const countdown = document.querySelector('#countdown');
-  game.setResponseTime(game.questions[game.count].second - parseInt(countdown.textContent));
-  game.setNextGame();
-
-  if (!game.isGameStarted) {
-    window.location.hash = '#result';
-    return;
+export const isCorrect = ({
+  value,
+  answer,
+  game,
+}: {
+  value: string;
+  answer: string;
+  game: Game;
+}) => {
+  if (value === answer) {
+    const countdown = document.querySelector('#countdown');
+    game.setResponseTime(game.questions[game.count].second - parseInt(countdown.textContent));
+    return true;
   }
-
-  const question = document.querySelector('#question');
-  question.innerHTML = game.questions[game.count].text.toString();
-  userAnswerELem.value = '';
-
-  setCountdown({ game });
+  return false;
 };
 
 export const checkCorrect = ({ game }: { game: Game }) => {
@@ -107,24 +115,43 @@ export const checkCorrect = ({ game }: { game: Game }) => {
   const value = userAnswerELem.value;
   const answer = game.questions[game.count].text;
 
-  if (isCorrect({ value, answer })) {
-    setNextGame({ game });
-    setCountdown({ game });
+  if (isCorrect({ value, answer, game })) {
+    moveToNextGame({ game });
   } else {
     userAnswerELem.value = '';
   }
 };
 
-export const mainInit = ({ game }: { game: Game }) => {
-  const startBtn = document.getElementById('start_btn');
-  startBtn.addEventListener('click', () => {
-    game.isGameStarted ? resetGame({ game }) : startGame({ game });
-  });
-  const answerElem = document.getElementById('answer');
-  answerElem.addEventListener('keydown', (e) => {
-    const keycode = e.key;
+//게임 시작
+export const onStartClick = async ({ game }: { game: Game }) => {
+  try {
+    const questions = await getQuestions();
+    setStartGame({ game, questions });
+  } catch (e) {
+    alert('문제를 불러오는 데에 문제가 생겼습니다.');
+    renderHTML({ game });
+    return;
+  }
+};
 
-    if (keycode === 'Enter') {
+//게임 초기화
+export const onResetClick = ({ game }: { game: Game }) => {
+  game.setResetGame();
+  renderHTML({ game });
+  setHTMLContent({ selector: '#question', content: TEXT_START_QUESTION });
+  setHTMLContent({ selector: '#start_btn', content: TEXT_START });
+};
+
+export const mainInit = ({ game }: { game: Game }) => {
+  const startBtn = document.querySelector('#start_btn');
+  startBtn.addEventListener('click', () => {
+    game.isGameStarted ? onResetClick({ game }) : onStartClick({ game });
+  });
+
+  const answerElem = document.querySelector('#answer') as HTMLInputElement;
+  answerElem.addEventListener('keydown', (e) => {
+    const { key } = e;
+    if (game.isGameStarted && key === 'Enter') {
       checkCorrect({ game });
     }
   });

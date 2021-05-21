@@ -9,19 +9,17 @@ export class Game {
   isGameStarted = false;
   questions = [] as Array<{ second: number; text: string }>;
   responseTime = [] as Array<number>;
-  modal = false;
 
   setScore(score: number) {
-    this.failCount++;
     this.score = score;
   }
 
-  setAvgTime() {
-    const reducer = (accumulator: number, currentValue: number) => accumulator + currentValue;
-    console.log(reducer, this.responseTime);
-    this.avgTime = Number(
-      (this.responseTime.reduce(reducer) / this.responseTime.length).toFixed(1)
-    );
+  setFailCount(count: number) {
+    this.failCount = count;
+  }
+
+  setAvgTime(time: number) {
+    this.avgTime = time;
   }
 
   setResponseTime(time: number) {
@@ -33,7 +31,7 @@ export class Game {
 
     if (next > this.questions.length - 1) {
       this.isGameStarted = false;
-      this.setAvgTime();
+      this.calcAvgTime();
     } else {
       this.count = next;
     }
@@ -58,14 +56,23 @@ export class Game {
     this.isGameStarted = true;
   }
 
-  setModal(open: boolean) {
-    this.modal = open;
+  calcAvgTime() {
+    const reducer = (accumulator: number, currentValue: number) => accumulator + currentValue;
+    this.setAvgTime(
+      Number((this.responseTime.reduce(reducer) / this.responseTime.length).toFixed(1))
+    );
   }
 }
 
 (() => {
   const game = new Game();
-  const hash = window.location.hash.replace('#', '');
-  window.addEventListener('hashchange', () => render({ game, hash }));
-  window.addEventListener('load', () => render({ game, hash }));
+
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    render({ game, hash });
+  });
+  window.addEventListener('load', () => {
+    const hash = window.location.hash.replace('#', '');
+    render({ game, hash });
+  });
 })();

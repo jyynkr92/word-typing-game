@@ -8,21 +8,32 @@ export const render = async ({ game, hash }: { game: Game; hash: string }) => {
   const root = document.getElementById('root');
   try {
     history.pushState(null, document.title, location.href);
+    if (hash === 'result') {
+      const item = JSON.parse(window.localStorage.getItem('gameResult'));
+
+      if (item) {
+        game.setAvgTime(item.avgTime);
+        game.setScore(item.score);
+      }
+    } else {
+      game.setResetGame();
+    }
+
     root.innerHTML = !hash
       ? setHomeHTML({
-          time: 10,
+          time: 0,
           score: game.score || 10,
           isGameStarted: game.isGameStarted || false,
-          modal: game.modal,
         })
       : setResultHTML({
-          time: hash === 'result' ? game.avgTime : 10,
+          time: hash === 'result' ? game.avgTime : 0,
           score: game.score || 10,
         });
 
     if (hash === 'result') {
       resultInit();
     } else {
+      window.localStorage.removeItem('gameResult');
       mainInit({ game });
     }
   } catch (e) {
