@@ -18,7 +18,7 @@ const setHomeHTML = ({
       </div>
       <div class="question" id="question">${TEXT_START_QUESTION}</div>
       <div class="text_wrapper">
-        <input type="text" id="answer" placeholder="${TEXT_PLACEHOLDER}"/>
+        <input type="text" id="answer" readOnly placeholder="${TEXT_PLACEHOLDER}"/>
       </div>
       <div class="btn_wrapper">
         <button id="start_btn">${isGameStarted ? TEXT_RESET : TEXT_START}</button>

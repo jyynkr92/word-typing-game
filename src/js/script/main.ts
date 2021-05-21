@@ -87,6 +87,8 @@ export const setStartGame = ({
 }) => {
   game.setQuestions(questions);
   game.setIsGameStarted(true);
+  const answerInpputElem = document.querySelector('#answer') as HTMLInputElement;
+  answerInpputElem.readOnly = false;
   renderHTML({ game });
   setCountdown({ game });
   setHTMLContent({ selector: '#question', content: questions[game.count].text.toString() });
@@ -140,6 +142,8 @@ export const onResetClick = ({ game }: { game: Game }) => {
   renderHTML({ game });
   setHTMLContent({ selector: '#question', content: TEXT_START_QUESTION });
   setHTMLContent({ selector: '#start_btn', content: TEXT_START });
+  const answerInpputElem = document.querySelector('#answer') as HTMLInputElement;
+  answerInpputElem.readOnly = true;
 };
 
 export const mainInit = ({ game }: { game: Game }) => {
