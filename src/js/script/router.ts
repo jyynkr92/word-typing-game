@@ -1,4 +1,4 @@
-import { Game } from '..';
+import Game from '../class/Game';
 import setHomeHTML from '../pages/home';
 import setResultHTML from '../pages/result';
 import { mainInit } from './main';

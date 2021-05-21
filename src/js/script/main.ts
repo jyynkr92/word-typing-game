@@ -1,4 +1,4 @@
-import { Game } from '..';
+import Game from '../class/Game';
 import { TEXT_RESET, TEXT_START, TEXT_START_QUESTION } from '../../data/content';
 import { getQuestions } from '../api/questionApi';
 import { setHTMLContent } from './common';

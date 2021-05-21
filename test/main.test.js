@@ -1,5 +1,5 @@
 import { TEXT_PLACEHOLDER, TEXT_START, TEXT_START_QUESTION } from '../src/data/content';
-import { Game } from '../src/js';
+import Game from '../src/js/class/Game';
 import {
   checkCorrect,
   isCorrect,
