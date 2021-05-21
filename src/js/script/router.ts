@@ -16,7 +16,7 @@ export const render = async ({ game, hash }: { game: Game; hash: string }) => {
         game.setScore(item.score);
       } else {
         window.location.hash = '#';
-        return;
+        window.location.reload();
       }
     } else {
       game.setResetGame();
